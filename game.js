@@ -170,46 +170,30 @@ function returnToMainMenu() {
 
 function handleKeyDown(e) {
     if (gameState === 'playing') {
-        if (isLocalMultiplayer) {
-            // Player 1 (left) controls
-            if (e.key === 'w') {
-                player1.dy = -paddleSpeed;
-            } else if (e.key === 's') {
-                player1.dy = paddleSpeed;
-            }
-            // Player 2 (right) controls
-            if (e.key === 'ArrowUp') {
-                player2.dy = -paddleSpeed;
-            } else if (e.key === 'ArrowDown') {
-                player2.dy = paddleSpeed;
-            }
-        } else {
-            // Single player controls (left paddle only)
-            if (e.key === 'ArrowUp') {
-                player1.dy = -paddleSpeed;
-            } else if (e.key === 'ArrowDown') {
-                player1.dy = paddleSpeed;
-            }
+        // Player 1 (left) controls
+        if (e.key === 'w') {
+            player1.dy = -paddleSpeed;
+        } else if (e.key === 's') {
+            player1.dy = paddleSpeed;
+        }
+        // Player 2 (right) controls
+        if (e.key === 'ArrowUp') {
+            player2.dy = -paddleSpeed;
+        } else if (e.key === 'ArrowDown') {
+            player2.dy = paddleSpeed;
         }
     }
 }
 
 function handleKeyUp(e) {
     if (gameState === 'playing') {
-        if (isLocalMultiplayer) {
-            // Player 1 (left) controls
-            if (e.key === 'w' || e.key === 's') {
-                player1.dy = 0;
-            }
-            // Player 2 (right) controls
-            if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {
-                player2.dy = 0;
-            }
-        } else {
-            // Single player controls (left paddle only)
-            if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {
-                player1.dy = 0;
-            }
+        // Player 1 (left) controls
+        if (e.key === 'w' || e.key === 's') {
+            player1.dy = 0;
+        }
+        // Player 2 (right) controls
+        if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {
+            player2.dy = 0;
         }
     }
 }
@@ -231,19 +215,8 @@ function updatePaddles() {
     player1.y += player1.dy;
     player1.y = Math.max(Math.min(player1.y, canvas.height - paddleHeight), 0);
 
-    if (isLocalMultiplayer) {
-        // Update player 2 for local multiplayer
-        player2.y += player2.dy;
-        player2.y = Math.max(Math.min(player2.y, canvas.height - paddleHeight), 0);
-    } else {
-        // Simple AI for player 2 in single-player mode
-        if (ball.y > player2.y + paddleHeight / 2) {
-            player2.y += paddleSpeed;
-        } else if (ball.y < player2.y + paddleHeight / 2) {
-            player2.y -= paddleSpeed;
-        }
-        player2.y = Math.max(Math.min(player2.y, canvas.height - paddleHeight), 0);
-    }
+    player2.y += player2.dy;
+    player2.y = Math.max(Math.min(player2.y, canvas.height - paddleHeight), 0);
 }
 
 function updateBall() {
