@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ping Pong - Online Play</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/simple-peer/9.11.0/simplepeer.min.js"></script>
+</head>
+<body>
+    <div id="online-container">
+        <h1>Online Play</h1>
+        <div id="connection-info">
+            <p>Your Connection ID: <span id="connectionId"></span></p>
+            <input type="text" id="peerIdInput" placeholder="Enter peer's connection ID">
+            <button id="connectBtn">Connect</button>
+        </div>
+        <div id="game-container" style="display: none;">
+            <canvas id="gameCanvas"></canvas>
+        </div>
+        <button id="backBtn">Back to Menu</button>
+    </div>
+    <script src="online.js"></script>
+</body>
+</html>

@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Online Pong</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/simple-peer/9.11.0/simplepeer.min.js"></script>
+    <script src="https://unpkg.com/peerjs@1.4.7/dist/peerjs.min.js"></script>
+    <style>
+        /* Add any necessary styles here */
+        #peerIdDisplay {
+            display: none;
+        }
+        #game-container {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div id="menu">
+        <button id="singlePlayerBtn">Single Player</button>
+        <button id="localMultiplayerBtn">Local Multiplayer</button>
+        <button id="onlinePlayBtn">Online Play</button>
+        <button id="quitBtn">Quit</button>
+    </div>
+
+    <div id="online-menu" style="display: none;">
+        <div id="peerIdDisplay">
+            <p>Your Connection ID: <span id="connectionId"></span></p>
+        </div>
+        <div id="connectForm">
+            <input type="text" id="peerIdInput" maxlength="3" placeholder="Enter 3-char ID">
+            <button id="connectBtn">Connect</button>
+        </div>
+        <button id="backBtn">Back to Main Menu</button>
+    </div>
+
+    <div id="game-container" style="display: none;">
+        <canvas id="gameCanvas"></canvas>
+        <div id="game-over-menu" style="display: none;">
+            <button id="playAgainBtn">Play Again</button>
+            <button id="mainMenuBtn">Main Menu</button>
+        </div>
+    </div>
+
+    <script src="game.js"></script>
+</body>
+</html>
