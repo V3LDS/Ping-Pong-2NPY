@@ -132,12 +132,12 @@ function connectToPeer() {
 
 function setupConnection() {
     conn.on('open', () => {
-        isHost = true;
+        isHost = true; // Set the host
         startGame();
     });
 
     conn.on('data', (data) => {
-        handlePeerMessage(JSON.parse(data));
+        handlePeerMessage(JSON.parse(data)); // Handle incoming messages
     });
 
     conn.on('close', () => {
@@ -242,9 +242,11 @@ function checkCollisions() {
 function checkScore() {
     if (ball.x - ball.radius < 0) {
         player2Score++;
+        sendScoreUpdate(); // Send score update to the other player
         resetBall();
     } else if (ball.x + ball.radius > canvas.width) {
         player1Score++;
+        sendScoreUpdate(); // Send score update to the other player
         resetBall();
     }
 
@@ -370,17 +372,43 @@ function drawParticles() {
 function gameLoop() {
     update();
     draw();
+    sendPeerData(); // Send paddle and ball data
     requestAnimationFrame(gameLoop);
 }
 
 function handlePeerMessage(data) {
-    // Handle incoming messages from peer
-    // Implement this based on your multiplayer logic
+    if (data.type === 'paddleMove') {
+        // Update opponent's paddle position
+        player2.y = data.position; // Update player2's position
+    } else if (data.type === 'ballUpdate') {
+        // Update ball position if you're not the host
+        ball.x = data.x;
+        ball.y = data.y;
+    } else if (data.type === 'scoreUpdate') {
+        // Update scores from the other player
+        player1Score = data.player1Score;
+        player2Score = data.player2Score;
+    }
 }
 
-function sendPeerData(data) {
+function sendPeerData() {
     if (conn && conn.open) {
-        conn.send(JSON.stringify(data));
+        // Send paddle position
+        const paddleData = {
+            type: 'paddleMove',
+            position: player1.y // Send player1's paddle position
+        };
+        conn.send(JSON.stringify(paddleData));
+
+        // Send ball position if host
+        if (isHost) {
+            const ballData = {
+                type: 'ballUpdate',
+                x: ball.x,
+                y: ball.y
+            };
+            conn.send(JSON.stringify(ballData));
+        }
     }
 }
 
@@ -420,4 +448,15 @@ function generateConsistentId() {
     }
     
     return result;
+}
+
+function sendScoreUpdate() {
+    if (conn && conn.open) {
+        const scoreData = {
+            type: 'scoreUpdate',
+            player1Score: player1Score,
+            player2Score: player2Score
+        };
+        conn.send(JSON.stringify(scoreData));
+    }
 }

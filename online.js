@@ -56,11 +56,11 @@ document.addEventListener('DOMContentLoaded', () => {
     function handlePeerMessage(message) {
         if (message.type === 'paddleMove') {
             // Update opponent's paddle position
-            opponentPaddleY = message.position;
+            player2.y = message.position; // Update player2's position
         } else if (message.type === 'ballUpdate' && !isHost) {
             // Update ball position if you're not the host
-            ballX = message.x;
-            ballY = message.y;
+            ball.x = message.x;
+            ball.y = message.y;
         }
     }
 
@@ -75,19 +75,6 @@ document.addEventListener('DOMContentLoaded', () => {
         render();
         sendGameState();
         requestAnimationFrame(gameLoop);
-    }
-
-    function update() {
-        // Your existing update logic here
-        // Make sure to only update the ball if you're the host
-        if (isHost) {
-            // Existing ball update logic
-        }
-        // Existing paddle update logic for the local player
-    }
-
-    function render() {
-        // Your existing render logic here
     }
 
     function sendGameState() {
