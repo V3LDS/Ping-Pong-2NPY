@@ -1,6 +1,7 @@
 let canvas, ctx;
 let player1, player2, ball;
-let player1Score = 0, player2Score = 0;
+let player1Score = 0; // Initialize Player 1 score
+let player2Score = 0; // Initialize Player 2 score;
 let gameState = 'title';
 let countdown = null;
 let myPeerId;
@@ -249,6 +250,10 @@ function checkScore() {
         sendScoreUpdate(); // Send score update to the other player
         resetBall();
     }
+
+    // Ensure scores are not negative
+    player1Score = Math.max(player1Score, 0);
+    player2Score = Math.max(player2Score, 0);
 
     if (player1Score >= WINNING_SCORE || player2Score >= WINNING_SCORE) {
         gameState = 'gameOver';
