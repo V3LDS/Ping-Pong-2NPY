@@ -10,6 +10,8 @@ let peer;
 let conn;
 let particles = [];
 let isLocalMultiplayer = false;
+let ballHistory = []; // Store previous ball states
+const MAX_HISTORY = 10; // Number of states to keep for interpolation
 
 const paddleWidth = 10;
 const paddleHeight = 60;
@@ -221,8 +223,17 @@ function updatePaddles() {
 }
 
 function updateBall() {
+    // Update ball position based on its velocity
     ball.x += ball.dx;
     ball.y += ball.dy;
+
+    // Store the current ball state
+    ballHistory.push({ x: ball.x, y: ball.y, timestamp: Date.now() });
+
+    // Limit the history size
+    if (ballHistory.length > MAX_HISTORY) {
+        ballHistory.shift(); // Remove the oldest state
+    }
 }
 
 function checkCollisions() {
@@ -376,6 +387,7 @@ function drawParticles() {
 
 function gameLoop() {
     update();
+    interpolateBall(); // Call interpolation
     draw();
     sendPeerData(); // Send paddle and ball data
     requestAnimationFrame(gameLoop);
@@ -389,6 +401,14 @@ function handlePeerMessage(data) {
         // Update ball position if you're not the host
         ball.x = data.x;
         ball.y = data.y;
+
+        // Store the received ball state
+        ballHistory.push({ x: ball.x, y: ball.y, timestamp: Date.now() });
+
+        // Limit the history size
+        if (ballHistory.length > MAX_HISTORY) {
+            ballHistory.shift(); // Remove the oldest state
+        }
     } else if (data.type === 'scoreUpdate') {
         // Update scores from the other player
         player1Score = data.player1Score;
@@ -463,5 +483,24 @@ function sendScoreUpdate() {
             player2Score: player2Score
         };
         conn.send(JSON.stringify(scoreData));
+    }
+}
+
+function interpolateBall() {
+    if (ballHistory.length > 1) {
+        const now = Date.now();
+        const lastState = ballHistory[ballHistory.length - 1];
+        const previousState = ballHistory[ballHistory.length - 2];
+
+        // Calculate the time difference
+        const timeDiff = now - previousState.timestamp;
+        const totalDiff = lastState.timestamp - previousState.timestamp;
+
+        // Calculate interpolation factor
+        const t = timeDiff / totalDiff;
+
+        // Interpolate ball position
+        ball.x = previousState.x + (lastState.x - previousState.x) * t;
+        ball.y = previousState.y + (lastState.y - previousState.y) * t;
     }
 }
