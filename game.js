@@ -19,6 +19,8 @@ const ballRadius = 5;
 const paddleSpeed = 5;
 const WINNING_SCORE = 5;
 
+let scoreRegistered = false; // Flag to track if a score has been registered
+
 function initGame() {
     canvas = document.getElementById('gameCanvas');
     ctx = canvas.getContext('2d');
@@ -252,14 +254,18 @@ function checkCollisions() {
 }
 
 function checkScore() {
-    if (ball.x - ball.radius < 0) {
-        player2Score++;
-        sendScoreUpdate(); // Send score update to the other player
-        resetBall();
-    } else if (ball.x + ball.radius > canvas.width) {
-        player1Score++;
-        sendScoreUpdate(); // Send score update to the other player
-        resetBall();
+    if (!scoreRegistered) { // Only check if a score hasn't been registered
+        if (ball.x - ball.radius < 0) {
+            player2Score++;
+            sendScoreUpdate(); // Send score update to the other player
+            resetBall();
+            scoreRegistered = true; // Set flag to true
+        } else if (ball.x + ball.radius > canvas.width) {
+            player1Score++;
+            sendScoreUpdate(); // Send score update to the other player
+            resetBall();
+            scoreRegistered = true; // Set flag to true
+        }
     }
 
     // Ensure scores are not negative
@@ -274,10 +280,11 @@ function checkScore() {
 }
 
 function resetBall() {
-    ball.x = canvas.width / 2;
-    ball.y = canvas.height / 2;
-    ball.dx = Math.random() > 0.5 ? 5 : -5;
-    ball.dy = Math.random() > 0.5 ? 5 : -5;
+    ball.x = canvas.width / 2; // Reset to center
+    ball.y = canvas.height / 2; // Reset to center
+    ball.vx = (Math.random() < 0.5 ? 1 : -1) * BALL_SPEED; // Randomize initial direction
+    ball.vy = 0; // Reset vertical velocity
+    scoreRegistered = false; // Reset the scoring flag
 }
 
 function draw() {
@@ -401,14 +408,8 @@ function handlePeerMessage(data) {
         // Update ball position if you're not the host
         ball.x = data.x;
         ball.y = data.y;
-
-        // Store the received ball state
-        ballHistory.push({ x: ball.x, y: ball.y, timestamp: Date.now() });
-
-        // Limit the history size
-        if (ballHistory.length > MAX_HISTORY) {
-            ballHistory.shift(); // Remove the oldest state
-        }
+        ball.vx = data.vx; // Update velocity
+        ball.vy = data.vy; // Update velocity
     } else if (data.type === 'scoreUpdate') {
         // Update scores from the other player
         player1Score = data.player1Score;
@@ -430,7 +431,9 @@ function sendPeerData() {
             const ballData = {
                 type: 'ballUpdate',
                 x: ball.x,
-                y: ball.y
+                y: ball.y,
+                vx: ball.vx,
+                vy: ball.vy
             };
             conn.send(JSON.stringify(ballData));
         }
